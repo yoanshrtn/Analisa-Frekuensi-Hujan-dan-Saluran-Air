@@ -4,73 +4,8 @@ import pandas as pd
 import scipy.stats as stats
 
 # ---------------------------------------------------------------------
-# SETUP HALAMAN & CUSTOM CSS (AGAR TAMPILAN JADI KEREN)
+# DATABASE KOEFISIEN PENGALIRAN (C KONSERVATIF/MAKSIMUM) DAN MANNING (n)
 # ---------------------------------------------------------------------
-st.set_page_config(page_title="Analisa Drainase", page_icon="🌊", layout="wide")
-
-st.markdown("""
-<style>
-    /* Banner Header */
-    .title-banner {
-        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-        padding: 25px;
-        border-radius: 12px;
-        color: white;
-        text-align: center;
-        margin-bottom: 25px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    }
-    .title-banner h2 {
-        color: white;
-        margin: 0;
-        font-family: 'Arial', sans-serif;
-    }
-    .title-banner p {
-        font-size: 16px;
-        margin-top: 5px;
-        opacity: 0.9;
-    }
-    /* Mempercantik Tombol */
-    div.stButton > button:first-child {
-        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-        color: white;
-        border-radius: 8px;
-        height: 50px;
-        font-weight: bold;
-        font-size: 18px;
-        border: none;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        transition: all 0.3s ease;
-    }
-    div.stButton > button:first-child:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-    }
-    /* Tabel Cantik */
-    .custom-table { border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 14px; margin-bottom: 25px; color: black; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);}
-    .custom-table th { background-color: #2a5298; color: white; padding: 10px; text-align: center; font-weight: bold; border: 1px solid #ddd;}
-    .custom-table td { border: 1px solid #ddd; padding: 8px 10px; text-align: center; color: black;}
-    .row-safe { background-color: #e8f5e9 !important; }
-    .row-unsafe { background-color: #ffebee !important; }
-    .status-safe { color: #2e7d32; font-weight: bold; }
-    .status-unsafe { color: #c62828; font-weight: bold; }
-    .info-box { background-color: #e3f2fd; border-left: 5px solid #1e3c72; padding: 15px; font-family: Arial; font-size: 14px; margin-bottom: 20px; color: black; border-radius: 0 8px 8px 0;}
-</style>
-""", unsafe_allow_html=True)
-
-# ---------------------------------------------------------------------
-# KONTEN UTAMA APLIKASI
-# ---------------------------------------------------------------------
-# Header Cantik HTML
-st.markdown("""
-<div class='title-banner'>
-    <h2>🌊 PROGRAM ANALISA FREKUENSI & EVALUASI DRAINASE</h2>
-
-</div>
-""", unsafe_allow_html=True)
-
-st.info("💡 **Petunjuk:** Silakan isi parameter pada kolom di bawah ini. Pastikan tidak ada kolom yang kosong sebelum menekan tombol hitung.", icon="ℹ️")
-
 DATABASE_C = {
     "Atap / Bangunan Kedap Air (0.75 - 0.95)": 0.95,
     "Jalan Aspal / Perkerasan Beton (0.70 - 0.95)": 0.95,
@@ -89,14 +24,108 @@ DATABASE_MANNING = {
     "Saluran Tanah Berrumput & Berbatu (n = 0.025 - 0.035)": (0.025, 0.035)
 }
 
-st.header("🌧️ 1. Data Hujan Harian Maksimum Tahunan (HHMT)", divider="blue")
+# ---------------------------------------------------------------------
+# SETUP HALAMAN & CUSTOM CSS (FONT ELEGAN & TANPA EMOJI)
+# ---------------------------------------------------------------------
+st.set_page_config(page_title="Analisa Drainase", layout="wide")
+
+st.markdown("""
+<style>
+    /* Import Font Elegan dari Google Fonts (Bodoni Moda untuk Judul, Inter untuk teks) */
+    @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@300;400;600&display=swap');
+
+    /* Mengubah font seluruh header bawaan Streamlit */
+    h1, h2, h3, h4 {
+        font-family: 'Bodoni Moda', serif !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.5px;
+    }
+
+    /* Banner Header Utama */
+    .title-banner {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        padding: 30px 20px;
+        border-radius: 4px;
+        color: white;
+        text-align: center;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .title-banner h2 {
+        color: white;
+        margin: 0;
+        font-family: 'Bodoni Moda', serif !important;
+        font-size: 2.2rem !important;
+        letter-spacing: 1.5px;
+    }
+    .title-banner p {
+        font-size: 15px;
+        font-family: 'Inter', sans-serif;
+        margin-top: 10px;
+        opacity: 0.9;
+        font-weight: 300;
+        letter-spacing: 1px;
+    }
+
+    /* Mempercantik Tombol Hitung */
+    div.stButton > button:first-child {
+        background: #1e3c72;
+        color: white;
+        border-radius: 4px;
+        height: 50px;
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        font-size: 16px;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    div.stButton > button:first-child:hover {
+        background: #2a5298;
+        box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+    }
+
+    /* Pengaturan Tabel & Teks Info */
+    .custom-table { 
+        border-collapse: collapse; width: 100%; font-family: 'Inter', sans-serif; 
+        font-size: 13px; margin-bottom: 25px; color: #333; background-color: white; 
+        border-radius: 4px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .custom-table th { background-color: #f8f9fa; color: #1e3c72; padding: 12px; text-align: center; font-weight: 600; border: 1px solid #e0e0e0;}
+    .custom-table td { border: 1px solid #e0e0e0; padding: 10px; text-align: center; color: #333;}
+    .row-safe { background-color: #f1f8e9 !important; }
+    .row-unsafe { background-color: #ffebee !important; }
+    .status-safe { color: #2e7d32; font-weight: 600; }
+    .status-unsafe { color: #c62828; font-weight: 600; }
+    .info-box { 
+        background-color: #f8f9fa; border-left: 4px solid #1e3c72; 
+        padding: 15px 20px; font-family: 'Inter', sans-serif; font-size: 13px; 
+        margin-bottom: 20px; color: #333; border-radius: 0 4px 4px 0;
+        line-height: 1.6;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------------------------
+# KONTEN UTAMA APLIKASI
+# ---------------------------------------------------------------------
+st.markdown("""
+<div class='title-banner'>
+    <h2>PROGRAM ANALISA FREKUENSI & KAPASITAS DRAINASE</h2>
+    <p>PERHITUNGAN HIDROLOGI METODE RASIONAL & EVALUASI SALURAN MANNING</p>
+</div>
+""", unsafe_allow_html=True)
+
+st.info("Petunjuk: Silakan isi parameter pada kolom di bawah ini. Pastikan tidak ada kolom yang dibiarkan kosong sebelum menekan tombol hitung.")
+
+st.header("1. Data Hujan Harian Maksimum Tahunan (HHMT)", divider="grey")
 col1, col2 = st.columns(2)
 with col1:
     w_tahun = st.text_area("Kolom Tahun:", "", height=200, placeholder="Contoh: \n2010\n2011\n2012...")
 with col2:
     w_hujan = st.text_area("Kolom Hujan (mm):", "", height=200, placeholder="Contoh: \n97.7\n72.5\n100.5...")
 
-st.header("🏞️ 2. Parameter Daerah Tangkapan Air (Catchment Area)", divider="blue")
+st.header("2. Parameter Daerah Tangkapan Air (Catchment Area)", divider="grey")
 w_c = st.selectbox("Penggunaan Lahan (C):", list(DATABASE_C.keys()))
 col3, col4 = st.columns(2)
 with col3:
@@ -104,7 +133,7 @@ with col3:
 with col4:
     w_tc = st.text_input("Waktu Konsentrasi tc (menit):", "")
 
-st.header("🚧 3. Parameter & Dimensi Saluran Drainase", divider="blue")
+st.header("3. Parameter & Dimensi Saluran Drainase", divider="grey")
 col5, col6 = st.columns(2)
 with col5:
     w_shape = st.selectbox("Bentuk Saluran:", ['Persegi', 'Trapesium', 'Segitiga'])
@@ -115,7 +144,7 @@ with col6:
     w_slope = st.text_input("Kemiringan Saluran S (m/m):", "")
     w_m = st.text_input("Kemiringan Tebing m (1:m):", "")
 
-st.markdown("<br>", unsafe_allow_html=True) # Spasi sebelum tombol
+st.markdown("<br>", unsafe_allow_html=True)
 
 def parse_float(val):
     return float(str(val).replace(',', '.').strip())
@@ -123,7 +152,7 @@ def parse_float(val):
 # ---------------------------------------------------------------------
 # LOGIKA PERHITUNGAN
 # ---------------------------------------------------------------------
-if st.button("🚀 Hitung & Analisa Keamanan Saluran", use_container_width=True):
+if st.button("Hitung Analisa Keamanan Saluran", use_container_width=True):
     try:
         th_lines = [int(x.strip()) for x in w_tahun.strip().split('\n') if x.strip()]
         hj_lines = [float(x.strip().replace(',', '.')) for x in w_hujan.strip().split('\n') if x.strip()]
@@ -135,18 +164,18 @@ if st.button("🚀 Hitung & Analisa Keamanan Saluran", use_container_width=True)
         m_side = parse_float(w_m)
         S_val = parse_float(w_slope)
     except Exception:
-        st.error("🚨 Pastikan seluruh angka pada kolom input diisi dengan benar dan tidak dibiarkan kosong!")
+        st.error("Pastikan seluruh angka pada kolom input diisi dengan benar dan tidak dibiarkan kosong.")
         st.stop()
 
     if len(th_lines) != len(hj_lines):
-        st.error("🚨 Jumlah data Tahun dan Hujan tidak sama!")
+        st.error("Jumlah data Tahun dan Hujan tidak sama.")
         st.stop()
 
     df = pd.DataFrame({'Tahun': th_lines, 'Hujan': hj_lines}).sort_values(by='Hujan').reset_index(drop=True)
     n = len(df)
 
     if n < 3:
-        st.error("🚨 Minimal butuh 3 baris data hujan!")
+        st.error("Minimal butuh 3 baris data hujan untuk melakukan analisa.")
         st.stop()
 
     with st.spinner('Menghitung Analisa Frekuensi & Kapasitas Saluran...'):
@@ -227,13 +256,13 @@ if st.button("🚀 Hitung & Analisa Keamanan Saluran", use_container_width=True)
 
         # --- D. TAMPILAN OUTPUT HTML ---
         st.markdown("<hr>", unsafe_allow_html=True)
-        st.header("📊 HASIL PERHITUNGAN", divider="blue")
+        st.header("HASIL PERHITUNGAN", divider="grey")
 
         html_code = f"""
         <div class='info-box'>
             <b>1. PARAMETER STATISTIK DATA (n = {n} Tahun):</b><br>
-            • <b>Yn:</b> {Yn:.4f} | <b>Sn:</b> {Sn:.4f} | <b>Rata-Rata (X):</b> {mean:.2f} mm | <b>Std Deviasi (S):</b> {std_dev:.2f} | <b>Cs:</b> {skew:.4f}<br>
-            • <b>Rata-Rata Log X:</b> {log_mean:.4f} | <b>Std Deviasi Log X:</b> {log_std:.4f} | <b>Cs Log X:</b> {log_skew:.4f}
+            • <b>Yn:</b> {Yn:.4f} &nbsp;|&nbsp; <b>Sn:</b> {Sn:.4f} &nbsp;|&nbsp; <b>Rata-Rata (X):</b> {mean:.2f} mm &nbsp;|&nbsp; <b>Std Deviasi (S):</b> {std_dev:.2f} &nbsp;|&nbsp; <b>Cs:</b> {skew:.4f}<br>
+            • <b>Rata-Rata Log X:</b> {log_mean:.4f} &nbsp;|&nbsp; <b>Std Deviasi Log X:</b> {log_std:.4f} &nbsp;|&nbsp; <b>Cs Log X:</b> {log_skew:.4f}
         </div>
         """
 
@@ -260,7 +289,7 @@ if st.button("🚀 Hitung & Analisa Keamanan Saluran", use_container_width=True)
         for met, dmax_val in results_ks.items():
             is_safe = dmax_val <= critical_ks_pct
             bg_class = "row-safe" if is_safe else "row-unsafe"
-            st_text = "<span class='status-safe'>✔ AMAN / DITERIMA</span>" if is_safe else "<span class='status-unsafe'>✘ TIDAK AMAN / DITOLAK</span>"
+            st_text = "<span class='status-safe'>AMAN / DITERIMA</span>" if is_safe else "<span class='status-unsafe'>TIDAK AMAN / DITOLAK</span>"
             
             html_code += f"<tr class='{bg_class}'>"
             html_code += f"<td><b>{met}</b></td><td>{dmax_val:.2f}%</td><td>{critical_ks_pct:.2f}%</td><td>{st_text}</td>"
@@ -271,9 +300,9 @@ if st.button("🚀 Hitung & Analisa Keamanan Saluran", use_container_width=True)
         <div class='info-box'>
             <b>METODE TERPILIH UNTUK DEBIT RENCANA:</b><br>
             • <b>Metode Terpilih:</b> <b>{best_metode}</b> (D<sub>max</sub> = {results_ks[best_metode]:.2f}% &le; {critical_ks_pct:.2f}%).<br>
-            • <b>Parameter Rasional:</b> C = <b>{C_val}</b> | A = <b>{A_val} km²</b> | t<sub>c</sub> = {tc_menit} mnt (<b>{tc_jam:.4f} jam</b>).<br>
-            • <b>Geometri Saluran ({w_shape}):</b> b = {b} m | h = {h} m &rarr; <b>A = {A_sal:.2f} m²</b> | <b>P = {P_sal:.2f} m</b> | <b>R = {R_sal:.6f} m</b>.<br>
-            • <b>Kecepatan Aliran (v):</b> v<sub>(n={n_min})</sub> = <b>{v_max_n:.3f} m/s</b> | v<sub>(n={n_max})</sub> = <b>{v_min_n:.3f} m/s</b>.
+            • <b>Parameter Rasional:</b> C = <b>{C_val}</b> &nbsp;|&nbsp; A = <b>{A_val} km²</b> &nbsp;|&nbsp; t<sub>c</sub> = {tc_menit} mnt (<b>{tc_jam:.4f} jam</b>).<br>
+            • <b>Geometri Saluran ({w_shape}):</b> b = {b} m &nbsp;|&nbsp; h = {h} m &rarr; <b>A = {A_sal:.2f} m²</b> &nbsp;|&nbsp; <b>P = {P_sal:.2f} m</b> &nbsp;|&nbsp; <b>R = {R_sal:.6f} m</b>.<br>
+            • <b>Kecepatan Aliran (v):</b> v<sub>(n={n_min})</sub> = <b>{v_max_n:.3f} m/s</b> &nbsp;|&nbsp; v<sub>(n={n_max})</sub> = <b>{v_min_n:.3f} m/s</b>.
         </div>
         """
 
@@ -295,8 +324,8 @@ if st.button("🚀 Hitung & Analisa Keamanan Saluran", use_container_width=True)
             safe_min_n = Q_sal_min_n >= q_rec
             safe_max_n = Q_sal_max_n >= q_rec
 
-            st_min_n = "<span class='status-safe'>✔ AMAN</span>" if safe_min_n else "<span class='status-unsafe'>✘ MELUAP</span>"
-            st_max_n = "<span class='status-safe'>✔ AMAN</span>" if safe_max_n else "<span class='status-unsafe'>✘ MELUAP</span>"
+            st_min_n = "<span class='status-safe'>AMAN</span>" if safe_min_n else "<span class='status-unsafe'>MELUAP</span>"
+            st_max_n = "<span class='status-safe'>AMAN</span>" if safe_max_n else "<span class='status-unsafe'>MELUAP</span>"
 
             bg_min_n = "row-safe" if safe_min_n else "row-unsafe"
             bg_max_n = "row-safe" if safe_max_n else "row-unsafe"
