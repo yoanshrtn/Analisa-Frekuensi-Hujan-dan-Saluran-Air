@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import scipy.stats as stats
+import streamlit.components.v1 as components # Tambahan untuk tombol Print
 
 # ---------------------------------------------------------------------
 # DATABASE KOEFISIEN PENGALIRAN (C KONSERVATIF/MAKSIMUM) DAN MANNING (n)
@@ -25,23 +26,21 @@ DATABASE_MANNING = {
 }
 
 # ---------------------------------------------------------------------
-# SETUP HALAMAN & CUSTOM CSS (FONT MONTSERRAT & ROBOTO - BOLD & CLEAR)
+# SETUP HALAMAN & CUSTOM CSS
 # ---------------------------------------------------------------------
 st.set_page_config(page_title="Analisa Drainase", layout="wide")
 
 st.markdown("""
 <style>
-    /* Import Font Profesional dari Google Fonts (Montserrat & Roboto) */
+    /* Import Font Profesional dari Google Fonts */
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Roboto:wght@400;500;700&display=swap');
 
-    /* Mengubah font seluruh header bawaan Streamlit */
+    /* TAMPILAN WEB UMUM */
     h1, h2, h3, h4 {
         font-family: 'Montserrat', sans-serif !important;
         font-weight: 700 !important;
         color: #111827 !important;
     }
-
-    /* Banner Header Utama */
     .title-banner {
         background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
         padding: 30px 20px;
@@ -51,61 +50,59 @@ st.markdown("""
         margin-bottom: 30px;
         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-    .title-banner h2 {
-        color: white !important;
-        margin: 0;
-        font-family: 'Montserrat', sans-serif !important;
-        font-size: 32px !important;
-        font-weight: 800 !important;
-        letter-spacing: -0.5px;
-    }
-    .title-banner p {
-        font-size: 16px;
-        font-family: 'Roboto', sans-serif;
-        margin-top: 10px;
-        color: #94a3b8;
-        font-weight: 500;
-        letter-spacing: 0.5px;
-    }
-
-    /* Mempercantik Tombol Hitung */
+    .title-banner h2 { color: white !important; margin: 0; font-size: 32px !important; font-weight: 800 !important;}
+    .title-banner p { font-size: 16px; font-family: 'Roboto', sans-serif; margin-top: 10px; color: #94a3b8; font-weight: 500;}
+    
     div.stButton > button:first-child {
-        background-color: #0c3184;
-        color: white;
-        border-radius: 6px;
-        height: 50px;
-        font-family: 'Montserrat', sans-serif;
-        font-weight: 700;
-        font-size: 16px;
-        border: none;
-        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
-        transition: all 0.2s ease-in-out;
+        background-color: #0c3184; color: white; border-radius: 6px; height: 50px;
+        font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 16px;
+        border: none; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2); transition: all 0.2s ease-in-out;
     }
-    div.stButton > button:first-child:hover {
-        background-color: #1d4ed8;
-        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
-    }
+    div.stButton > button:first-child:hover { background-color: #1d4ed8; }
 
-    /* Pengaturan Tabel & Teks Info */
-    .custom-table { 
-        border-collapse: collapse; width: 100%; font-family: 'Roboto', sans-serif; 
-        font-size: 14px; margin-bottom: 25px; color: #1f2937; background-color: white; 
-        border-radius: 6px; overflow: hidden; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    }
+    .custom-table { border-collapse: collapse; width: 100%; font-family: 'Roboto', sans-serif; font-size: 14px; margin-bottom: 25px; color: #1f2937; background-color: white; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1);}
     .custom-table th { background-color: #f1f5f9; color: #334155; padding: 12px; text-align: center; font-weight: 700; border: 1px solid #e2e8f0; font-family: 'Montserrat', sans-serif; font-size: 13px;}
     .custom-table td { border: 1px solid #e2e8f0; padding: 10px; text-align: center; color: #1f2937;}
     .row-safe { background-color: #f0fdf4 !important; }
     .row-unsafe { background-color: #fef2f2 !important; }
     .status-safe { color: #166534; font-weight: 700; }
     .status-unsafe { color: #991b1b; font-weight: 700; }
-    .info-box { 
-        background-color: #f8fafc; border-left: 4px solid #3b82f6; 
-        padding: 15px 20px; font-family: 'Roboto', sans-serif; font-size: 14px; 
-        margin-bottom: 20px; color: #334155; border-radius: 0 6px 6px 0;
-        line-height: 1.6; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    }
-    .info-box b {
-        color: #0f172a;
+    .info-box { background-color: #f8fafc; border-left: 4px solid #3b82f6; padding: 15px 20px; font-family: 'Roboto', sans-serif; font-size: 14px; margin-bottom: 20px; color: #334155; border-radius: 0 6px 6px 0; line-height: 1.6;}
+    .info-box b { color: #0f172a; }
+
+    /* ============================================================== */
+    /* PENGATURAN MODE CETAK / PDF (A4 FORMATTING) */
+    /* ============================================================== */
+    @media print {
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+        /* Sembunyikan Elemen UI Streamlit yang tidak perlu dicetak */
+        header[data-testid="stHeader"], 
+        div[data-testid="stSidebar"], 
+        footer,
+        div.stButton,
+        .stAlert,
+        iframe {
+            display: none !important;
+        }
+        body { background-color: white !important; color: black !important; }
+        
+        /* Modifikasi Banner agar tinta printer hemat & rapi */
+        .title-banner { background: none !important; color: black !important; box-shadow: none !important; border-bottom: 2px solid #333; padding-bottom: 10px;}
+        .title-banner h2, .title-banner p { color: black !important; }
+        
+        /* Cegah tabel terpotong di tengah baris ke halaman selanjutnya */
+        .custom-table { page-break-inside: avoid; border: 1px solid #000; box-shadow: none; }
+        .custom-table th, .custom-table td { border: 1px solid #000 !important; color: black !important; }
+        .custom-table th { background-color: #ddd !important; -webkit-print-color-adjust: exact; }
+        
+        .info-box { background-color: #f0f0f0 !important; border-left: 4px solid #000 !important; -webkit-print-color-adjust: exact; }
+        
+        /* Ganti background warna aman/tidak aman jadi teks untuk mode cetak */
+        .row-safe { background-color: #fff !important; }
+        .row-unsafe { background-color: #f9f9f9 !important; }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -116,11 +113,13 @@ st.markdown("""
 st.markdown("""
 <div class='title-banner'>
     <h2>ANALISA FREKUENSI & KAPASITAS DRAINASE</h2>
+    <p>LAPORAN PERHITUNGAN HIDROLOGI METODE RASIONAL</p>
 </div>
 """, unsafe_allow_html=True)
 
 st.info("Petunjuk: Silakan isi parameter pada kolom di bawah ini. Pastikan tidak ada kolom yang dibiarkan kosong sebelum menekan tombol hitung.")
 
+# (Gunakan form untuk input agar saat ditekan Enter tidak langsung me-refresh page)
 st.header("Data Hujan Harian Maksimum Tahunan (HHMT)", divider="blue")
 col1, col2 = st.columns(2)
 with col1:
@@ -155,7 +154,7 @@ def parse_float(val):
 # ---------------------------------------------------------------------
 # LOGIKA PERHITUNGAN
 # ---------------------------------------------------------------------
-if st.button("HITUNG ANALISA", use_container_width=True):
+if st.button("HITUNG ANALISA & BUAT LAPORAN", use_container_width=True):
     try:
         th_lines = [int(x.strip()) for x in w_tahun.strip().split('\n') if x.strip()]
         hj_lines = [float(x.strip().replace(',', '.')) for x in w_hujan.strip().split('\n') if x.strip()]
@@ -342,3 +341,35 @@ if st.button("HITUNG ANALISA", use_container_width=True):
         html_code += "</table>"
         
         st.markdown(html_code, unsafe_allow_html=True)
+        
+        # --- TOMBOL PRINT JAVASCRIPT ---
+        components.html(
+            """
+            <script>
+                function printPage() {
+                    window.parent.print();
+                }
+            </script>
+            <style>
+                .btn-print {
+                    background-color: #0c3184;
+                    color: white;
+                    padding: 12px 20px;
+                    border: none;
+                    border-radius: 6px;
+                    font-family: 'Montserrat', sans-serif;
+                    font-weight: 700;
+                    font-size: 16px;
+                    cursor: pointer;
+                    width: 100%;
+                    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+                    transition: all 0.2s;
+                }
+                .btn-print:hover {
+                    background-color: #1d4ed8;
+                }
+            </style>
+            <button class="btn-print" onclick="printPage()">🖨️ CETAK LAPORAN / SIMPAN PDF (A4)</button>
+            """,
+            height=70
+        )
