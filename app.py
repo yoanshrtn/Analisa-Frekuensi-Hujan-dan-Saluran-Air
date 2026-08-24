@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import scipy.stats as stats
-import streamlit.components.v1 as components # Tambahan untuk tombol Print
+import streamlit.components.v1 as components
 
 # ---------------------------------------------------------------------
 # DATABASE KOEFISIEN PENGALIRAN (C KONSERVATIF/MAKSIMUM) DAN MANNING (n)
@@ -26,81 +26,91 @@ DATABASE_MANNING = {
 }
 
 # ---------------------------------------------------------------------
-# SETUP HALAMAN & CUSTOM CSS
+# SETUP HALAMAN & CUSTOM CSS (CLEAN & MINIMALIST)
 # ---------------------------------------------------------------------
-st.set_page_config(page_title="Analisa Drainase", layout="wide")
+st.set_page_config(page_title="Analisa Drainase", layout="centered") # Ubah ke centered agar lebih rapih seperti dokumen
 
 st.markdown("""
 <style>
-    /* Import Font Profesional dari Google Fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Roboto:wght@400;500;700&display=swap');
+    /* Import Font */
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600&display=swap');
 
     /* TAMPILAN WEB UMUM */
-    h1, h2, h3, h4 {
-        font-family: 'Montserrat', sans-serif !important;
-        font-weight: 700 !important;
-        color: #111827 !important;
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif;
     }
-    .title-banner {
-        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-        padding: 30px 20px;
-        border-radius: 4px;
-        color: white;
-        text-align: center;
-        margin-bottom: 30px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    .title-banner h2 { color: white !important; margin: 0; font-size: 32px !important; font-weight: 800 !important;}
-    .title-banner p { font-size: 16px; font-family: 'Roboto', sans-serif; margin-top: 10px; color: #94a3b8; font-weight: 500;}
     
-    div.stButton > button:first-child {
-        background-color: #0c3184; color: white; border-radius: 6px; height: 50px;
-        font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 16px;
-        border: none; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2); transition: all 0.2s ease-in-out;
+    /* Styling Judul Utama */
+    .main-title {
+        text-align: center;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 900;
+        font-size: 32px;
+        color: #000000;
+        margin-bottom: 10px;
+        line-height: 1.2;
     }
-    div.stButton > button:first-child:hover { background-color: #1d4ed8; }
+    .sub-title {
+        text-align: center;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        color: #111111;
+        margin-bottom: 20px;
+    }
+    .title-divider {
+        border-bottom: 2px solid #444444;
+        margin-bottom: 40px;
+    }
 
-    .custom-table { border-collapse: collapse; width: 100%; font-family: 'Roboto', sans-serif; font-size: 14px; margin-bottom: 25px; color: #1f2937; background-color: white; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1);}
-    .custom-table th { background-color: #f1f5f9; color: #334155; padding: 12px; text-align: center; font-weight: 700; border: 1px solid #e2e8f0; font-family: 'Montserrat', sans-serif; font-size: 13px;}
+    /* Styling Header Seksi bawaan Streamlit (st.header) */
+    h2 {
+        font-family: 'Montserrat', sans-serif !important;
+        font-weight: 800 !important;
+        font-size: 28px !important;
+        color: #111827 !important;
+        padding-bottom: 5px;
+    }
+
+    /* Mempercantik Tombol Hitung */
+    div.stButton > button:first-child {
+        background-color: #0f172a; 
+        color: white; 
+        border-radius: 6px; 
+        height: 50px;
+        font-family: 'Montserrat', sans-serif; 
+        font-weight: 700; 
+        font-size: 16px;
+        border: none; 
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2); 
+        transition: all 0.2s ease-in-out;
+        margin-top: 20px;
+    }
+    div.stButton > button:first-child:hover { background-color: #1e293b; }
+
+    /* Styling Tabel */
+    .custom-table { border-collapse: collapse; width: 100%; font-family: 'Inter', sans-serif; font-size: 13px; margin-bottom: 25px; color: #1f2937; background-color: white; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1);}
+    .custom-table th { background-color: #f8fafc; color: #334155; padding: 12px; text-align: center; font-weight: 700; border: 1px solid #e2e8f0; font-family: 'Montserrat', sans-serif; font-size: 12px;}
     .custom-table td { border: 1px solid #e2e8f0; padding: 10px; text-align: center; color: #1f2937;}
     .row-safe { background-color: #f0fdf4 !important; }
     .row-unsafe { background-color: #fef2f2 !important; }
     .status-safe { color: #166534; font-weight: 700; }
     .status-unsafe { color: #991b1b; font-weight: 700; }
-    .info-box { background-color: #f8fafc; border-left: 4px solid #3b82f6; padding: 15px 20px; font-family: 'Roboto', sans-serif; font-size: 14px; margin-bottom: 20px; color: #334155; border-radius: 0 6px 6px 0; line-height: 1.6;}
+    
+    .info-box { background-color: #f8fafc; border-left: 4px solid #3b82f6; padding: 15px 20px; font-size: 13.5px; margin-bottom: 20px; color: #334155; border-radius: 0 6px 6px 0;}
     .info-box b { color: #0f172a; }
 
     /* ============================================================== */
     /* PENGATURAN MODE CETAK / PDF (A4 FORMATTING) */
     /* ============================================================== */
     @media print {
-        @page {
-            size: A4;
-            margin: 15mm;
-        }
-        /* Sembunyikan Elemen UI Streamlit yang tidak perlu dicetak */
-        header[data-testid="stHeader"], 
-        div[data-testid="stSidebar"], 
-        footer,
-        div.stButton,
-        .stAlert,
-        iframe {
-            display: none !important;
-        }
+        @page { size: A4; margin: 15mm; }
+        header[data-testid="stHeader"], div[data-testid="stSidebar"], footer, div.stButton, .stAlert, iframe { display: none !important; }
         body { background-color: white !important; color: black !important; }
-        
-        /* Modifikasi Banner agar tinta printer hemat & rapi */
-        .title-banner { background: none !important; color: black !important; box-shadow: none !important; border-bottom: 2px solid #333; padding-bottom: 10px;}
-        .title-banner h2, .title-banner p { color: black !important; }
-        
-        /* Cegah tabel terpotong di tengah baris ke halaman selanjutnya */
         .custom-table { page-break-inside: avoid; border: 1px solid #000; box-shadow: none; }
         .custom-table th, .custom-table td { border: 1px solid #000 !important; color: black !important; }
         .custom-table th { background-color: #ddd !important; -webkit-print-color-adjust: exact; }
-        
         .info-box { background-color: #f0f0f0 !important; border-left: 4px solid #000 !important; -webkit-print-color-adjust: exact; }
-        
-        /* Ganti background warna aman/tidak aman jadi teks untuk mode cetak */
         .row-safe { background-color: #fff !important; }
         .row-unsafe { background-color: #f9f9f9 !important; }
     }
@@ -110,31 +120,33 @@ st.markdown("""
 # ---------------------------------------------------------------------
 # KONTEN UTAMA APLIKASI
 # ---------------------------------------------------------------------
+# Header Laporan Minimalis
 st.markdown("""
-<div class='title-banner'>
-    <h2>ANALISA FREKUENSI & KAPASITAS DRAINASE</h2>
-    <p>LAPORAN PERHITUNGAN HIDROLOGI METODE RASIONAL</p>
-</div>
+<div class='main-title'>ANALISA FREKUENSI & KAPASITAS DRAINASE</div>
+<div class='sub-title'></div>
+<div class='title-divider'></div>
 """, unsafe_allow_html=True)
 
-st.info("Petunjuk: Silakan isi parameter pada kolom di bawah ini. Pastikan tidak ada kolom yang dibiarkan kosong sebelum menekan tombol hitung.")
-
-# (Gunakan form untuk input agar saat ditekan Enter tidak langsung me-refresh page)
+# Seksi 1: Data Hujan
 st.header("Data Hujan Harian Maksimum Tahunan (HHMT)", divider="blue")
 col1, col2 = st.columns(2)
 with col1:
-    w_tahun = st.text_area("Kolom Tahun:", "", height=200, placeholder="Contoh: \n2010\n2011\n2012...")
+    # Ukuran height diperkecil jadi 130 agar rapi
+    w_tahun = st.text_area("Kolom Tahun:", "", height=130, placeholder="Contoh:\n2018\n2019\n2020\n2021\n2022\n2023\n2024\n2025")
 with col2:
-    w_hujan = st.text_area("Kolom Hujan (mm):", "", height=200, placeholder="Contoh: \n97.7\n72.5\n100.5...")
+    w_hujan = st.text_area("Kolom Hujan (mm):", "", height=130, placeholder="Contoh:\n97.700\n72.500\n100.500\n117.500\n121.500\n136.000\n92.500\n105.000")
 
+# Seksi 2: Parameter DTA (Layout diubah agar mirip referensi)
 st.header("Parameter Daerah Tangkapan Air (Catchment Area)", divider="blue")
 w_c = st.selectbox("Penggunaan Lahan (C):", list(DATABASE_C.keys()))
+
 col3, col4 = st.columns(2)
 with col3:
     w_area = st.text_input("Luas DTA / Catchment Area A (km²):", "")
 with col4:
     w_tc = st.text_input("Waktu Konsentrasi tc (menit):", "")
 
+# Seksi 3: Parameter Saluran
 st.header("Parameter & Dimensi Saluran Drainase", divider="blue")
 col5, col6 = st.columns(2)
 with col5:
@@ -144,7 +156,7 @@ with col5:
 with col6:
     w_material = st.selectbox("Bahan / Lapisan Saluran:", list(DATABASE_MANNING.keys()))
     w_slope = st.text_input("Kemiringan Saluran S (m/m):", "")
-    w_m = st.text_input("Kemiringan Tebing m (1:m):", "")
+    w_m = st.text_input("Kemiringan Tebing m (1:m):", "0") # Default 0 untuk persegi
 
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -257,8 +269,8 @@ if st.button("HITUNG ANALISA & BUAT LAPORAN", use_container_width=True):
         Q_sal_min_n = v_max_n * A_sal 
 
         # --- D. TAMPILAN OUTPUT HTML ---
-        st.markdown("<hr>", unsafe_allow_html=True)
-        st.header("HASIL PERHITUNGAN", divider="blue")
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.header("Hasil Perhitungan & Evaluasi", divider="blue")
 
         html_code = f"""
         <div class='info-box'>
@@ -268,7 +280,7 @@ if st.button("HITUNG ANALISA & BUAT LAPORAN", use_container_width=True):
         </div>
         """
 
-        html_code += "<h4>Hasil Analisa Frekuensi Hujan Rencana</h4>"
+        html_code += "<h4>1. Hasil Analisa Frekuensi Hujan Rencana</h4>"
         html_code += "<table class='custom-table'>"
         html_code += "<tr><th>Periode Ulang (T)</th><th>Probabilitas</th><th>Normal (mm)</th><th>Log Normal (mm)</th><th>Gumbel (mm)</th><th>Pearson III (mm)</th><th>Log Pearson III (mm)</th></tr>"
         
@@ -284,7 +296,7 @@ if st.button("HITUNG ANALISA & BUAT LAPORAN", use_container_width=True):
             html_code += f"</tr>"
         html_code += "</table>"
 
-        html_code += f"<h4>Hasil Uji Kesesuaian Kolmogorov-Smirnov (Batas Kritis D<sub>tabel</sub> = {critical_ks_pct:.2f}%)</h4>"
+        html_code += f"<h4>2. Hasil Uji Kesesuaian Kolmogorov-Smirnov (Batas Kritis D<sub>tabel</sub> = {critical_ks_pct:.2f}%)</h4>"
         html_code += "<table class='custom-table'>"
         html_code += "<tr><th>Metode Distribusi</th><th>D<sub>max</sub> (%)</th><th>D<sub>tabel</sub> (α = 5%)</th><th>Status Kesesuaian</th></tr>"
         
@@ -308,16 +320,16 @@ if st.button("HITUNG ANALISA & BUAT LAPORAN", use_container_width=True):
         </div>
         """
 
-        html_code += f"<h4>Tabel Hujan & Debit Rencana (Q<sub>rencana</sub> - {best_metode})</h4>"
+        html_code += f"<h4>3. Tabel Hujan & Debit Rencana (Q<sub>rencana</sub> - {best_metode})</h4>"
         html_code += "<table class='custom-table'>"
         html_code += "<tr><th>Periode Ulang (T)</th><th>Probabilitas</th><th>R<sub>24</sub> Terpilih (mm)</th><th>Intensitas Hujan I (mm/jam)</th><th>Debit Rencana Q<sub>rencana</sub> (m³/s)</th></tr>"
         for idx_t, t_val in enumerate(T_list):
             html_code += f"<tr><td><b>T = {t_val} Tahun</b></td><td>{prob_labels[idx_t]}</td><td>{r_24_best[idx_t]:.3f}</td><td>{i_list[idx_t]:.3f}</td><td><b>{q_rencana_list[idx_t]:.3f} m³/s</b></td></tr>"
         html_code += "</table>"
 
-        html_code += f"<h4>Evaluasi Keamanan Saluran (Q<sub>saluran</sub> vs Q<sub>rencana</sub>)</h4>"
+        html_code += f"<h4>4. Evaluasi Keamanan Saluran (Q<sub>saluran</sub> vs Q<sub>rencana</sub>)</h4>"
         html_code += "<table class='custom-table'>"
-        html_code += f"<tr><th rowspan='2'>Periode Ulang</th><th rowspan='2'>Q<sub>rencana</sub> (m³/s)</th><th colspan='2'>Kekasaran n = {n_min} (Kondisi Licin)<br><i>Q<sub>saluran</sub> = {Q_sal_min_n:.3f} m³/s ({Q_sal_min_n*1000:.1f} L/s)</i></th><th colspan='2'>Kekasaran n = {n_max} (Kondisi Kasar)<br><i>Q<sub>saluran</sub> = {Q_sal_max_n:.3f} m³/s ({Q_sal_max_n*1000:.1f} L/s)</i></th></tr>"
+        html_code += f"<tr><th rowspan='2'>Periode Ulang</th><th rowspan='2'>Q<sub>rencana</sub> (m³/s)</th><th colspan='2'>Kekasaran n = {n_min} (Kondisi Licin)<br><i>Q<sub>saluran</sub> = {Q_sal_min_n:.3f} m³/s</i></th><th colspan='2'>Kekasaran n = {n_max} (Kondisi Kasar)<br><i>Q<sub>saluran</sub> = {Q_sal_max_n:.3f} m³/s</i></th></tr>"
         html_code += "<tr><th>Q<sub>saluran</sub> (m³/s)</th><th>Status</th><th>Q<sub>saluran</sub> (m³/s)</th><th>Status</th></tr>"
 
         for idx_t, t_val in enumerate(T_list):
@@ -352,7 +364,7 @@ if st.button("HITUNG ANALISA & BUAT LAPORAN", use_container_width=True):
             </script>
             <style>
                 .btn-print {
-                    background-color: #0c3184;
+                    background-color: #0f172a;
                     color: white;
                     padding: 12px 20px;
                     border: none;
@@ -362,14 +374,12 @@ if st.button("HITUNG ANALISA & BUAT LAPORAN", use_container_width=True):
                     font-size: 16px;
                     cursor: pointer;
                     width: 100%;
-                    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
                     transition: all 0.2s;
                 }
-                .btn-print:hover {
-                    background-color: #1d4ed8;
-                }
+                .btn-print:hover { background-color: #1e293b; }
             </style>
-            <button class="btn-print" onclick="printPage()">🖨️ CETAK LAPORAN / SIMPAN PDF (A4)</button>
+            <button class="btn-print" onclick="printPage()">CETAK LAPORAN / SIMPAN PDF (A4)</button>
             """,
             height=70
         )
