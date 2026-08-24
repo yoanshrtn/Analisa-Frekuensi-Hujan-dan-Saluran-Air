@@ -259,17 +259,17 @@ if st.button("HITUNG ANALISA", use_container_width=True):
 
         # --- D. TAMPILAN OUTPUT HTML ---
         st.markdown("<hr>", unsafe_allow_html=True)
-        st.header("HASIL PERHITUNGAN", divider="grey")
+        st.header("HASIL PERHITUNGAN", divider="blue")
 
         html_code = f"""
         <div class='info-box'>
-            <b>1. PARAMETER STATISTIK DATA (n = {n} Tahun):</b><br>
+            <b>PARAMETER STATISTIK DATA (n = {n} Tahun):</b><br>
             • <b>Yn:</b> {Yn:.4f} &nbsp;|&nbsp; <b>Sn:</b> {Sn:.4f} &nbsp;|&nbsp; <b>Rata-Rata (X):</b> {mean:.2f} mm &nbsp;|&nbsp; <b>Std Deviasi (S):</b> {std_dev:.2f} &nbsp;|&nbsp; <b>Cs:</b> {skew:.4f}<br>
             • <b>Rata-Rata Log X:</b> {log_mean:.4f} &nbsp;|&nbsp; <b>Std Deviasi Log X:</b> {log_std:.4f} &nbsp;|&nbsp; <b>Cs Log X:</b> {log_skew:.4f}
         </div>
         """
 
-        html_code += "<h4>1. Hasil Analisa Frekuensi Hujan Rencana (Semua Distribusi)</h4>"
+        html_code += "<h4>Hasil Analisa Frekuensi Hujan Rencana</h4>"
         html_code += "<table class='custom-table'>"
         html_code += "<tr><th>Periode Ulang (T)</th><th>Probabilitas</th><th>Normal (mm)</th><th>Log Normal (mm)</th><th>Gumbel (mm)</th><th>Pearson III (mm)</th><th>Log Pearson III (mm)</th></tr>"
         
@@ -285,7 +285,7 @@ if st.button("HITUNG ANALISA", use_container_width=True):
             html_code += f"</tr>"
         html_code += "</table>"
 
-        html_code += f"<h4>2. Hasil Uji Kesesuaian Kolmogorov-Smirnov (Batas Kritis D<sub>tabel</sub> = {critical_ks_pct:.2f}%)</h4>"
+        html_code += f"<h4>Hasil Uji Kesesuaian Kolmogorov-Smirnov (Batas Kritis D<sub>tabel</sub> = {critical_ks_pct:.2f}%)</h4>"
         html_code += "<table class='custom-table'>"
         html_code += "<tr><th>Metode Distribusi</th><th>D<sub>max</sub> (%)</th><th>D<sub>tabel</sub> (α = 5%)</th><th>Status Kesesuaian</th></tr>"
         
@@ -309,14 +309,14 @@ if st.button("HITUNG ANALISA", use_container_width=True):
         </div>
         """
 
-        html_code += f"<h4>3. Tabel Hujan & Debit Rencana (Q<sub>rencana</sub> - {best_metode})</h4>"
+        html_code += f"<h4>Tabel Hujan & Debit Rencana (Q<sub>rencana</sub> - {best_metode})</h4>"
         html_code += "<table class='custom-table'>"
         html_code += "<tr><th>Periode Ulang (T)</th><th>Probabilitas</th><th>R<sub>24</sub> Terpilih (mm)</th><th>Intensitas Hujan I (mm/jam)</th><th>Debit Rencana Q<sub>rencana</sub> (m³/s)</th></tr>"
         for idx_t, t_val in enumerate(T_list):
             html_code += f"<tr><td><b>T = {t_val} Tahun</b></td><td>{prob_labels[idx_t]}</td><td>{r_24_best[idx_t]:.3f}</td><td>{i_list[idx_t]:.3f}</td><td><b>{q_rencana_list[idx_t]:.3f} m³/s</b></td></tr>"
         html_code += "</table>"
 
-        html_code += f"<h4>4. Evaluasi Keamanan Saluran (Q<sub>saluran</sub> vs Q<sub>rencana</sub>)</h4>"
+        html_code += f"<h4>Evaluasi Keamanan Saluran (Q<sub>saluran</sub> vs Q<sub>rencana</sub>)</h4>"
         html_code += "<table class='custom-table'>"
         html_code += f"<tr><th rowspan='2'>Periode Ulang</th><th rowspan='2'>Q<sub>rencana</sub> (m³/s)</th><th colspan='2'>Kekasaran n = {n_min} (Kondisi Licin)<br><i>Q<sub>saluran</sub> = {Q_sal_min_n:.3f} m³/s ({Q_sal_min_n*1000:.1f} L/s)</i></th><th colspan='2'>Kekasaran n = {n_max} (Kondisi Kasar)<br><i>Q<sub>saluran</sub> = {Q_sal_max_n:.3f} m³/s ({Q_sal_max_n*1000:.1f} L/s)</i></th></tr>"
         html_code += "<tr><th>Q<sub>saluran</sub> (m³/s)</th><th>Status</th><th>Q<sub>saluran</sub> (m³/s)</th><th>Status</th></tr>"
