@@ -26,7 +26,7 @@ DATABASE_MANNING = {
 
 st.set_page_config(page_title="Analisa Drainase", layout="wide")
 
-st.title("=== PROGRAM DRAINASE: ANALISA FREKUENSI & EVALUASI SALURAN ===")
+st.title("ANALISA FREKUENSI & EVALUASI SALURAN")
 st.markdown("Petunjuk: Silakan periksa/sesuaikan parameter input, lalu klik tombol untuk mengkalkulasi.")
 
 # ---------------------------------------------------------------------
