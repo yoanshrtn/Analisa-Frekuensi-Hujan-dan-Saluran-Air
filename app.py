@@ -64,8 +64,8 @@ st.markdown("""
 # Header Cantik HTML
 st.markdown("""
 <div class='title-banner'>
-    <h2>🌊 PROGRAM ANALISA FREKUENSI & KAPASITAS DRAINASE</h2>
-    <p>Aplikasi Perhitungan Hidrologi Metode Rasional & Evaluasi Saluran Manning</p>
+    <h2>🌊 PROGRAM ANALISA FREKUENSI & EVALUASI DRAINASE</h2>
+
 </div>
 """, unsafe_allow_html=True)
 
