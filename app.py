@@ -70,7 +70,7 @@ st.markdown("""
 
     /* Mempercantik Tombol Hitung */
     div.stButton > button:first-child {
-        background-color: #2563eb;
+        background-color: #0c3184;
         color: white;
         border-radius: 6px;
         height: 50px;
@@ -121,14 +121,14 @@ st.markdown("""
 
 st.info("Petunjuk: Silakan isi parameter pada kolom di bawah ini. Pastikan tidak ada kolom yang dibiarkan kosong sebelum menekan tombol hitung.")
 
-st.header("1. Data Hujan Harian Maksimum Tahunan (HHMT)", divider="grey")
+st.header("Data Hujan Harian Maksimum Tahunan (HHMT)", divider="blue")
 col1, col2 = st.columns(2)
 with col1:
     w_tahun = st.text_area("Kolom Tahun:", "", height=200, placeholder="Contoh: \n2010\n2011\n2012...")
 with col2:
     w_hujan = st.text_area("Kolom Hujan (mm):", "", height=200, placeholder="Contoh: \n97.7\n72.5\n100.5...")
 
-st.header("2. Parameter Daerah Tangkapan Air (Catchment Area)", divider="grey")
+st.header("Parameter Daerah Tangkapan Air (Catchment Area)", divider="blue")
 w_c = st.selectbox("Penggunaan Lahan (C):", list(DATABASE_C.keys()))
 col3, col4 = st.columns(2)
 with col3:
@@ -136,7 +136,7 @@ with col3:
 with col4:
     w_tc = st.text_input("Waktu Konsentrasi tc (menit):", "")
 
-st.header("3. Parameter & Dimensi Saluran Drainase", divider="grey")
+st.header("Parameter & Dimensi Saluran Drainase", divider="blue")
 col5, col6 = st.columns(2)
 with col5:
     w_shape = st.selectbox("Bentuk Saluran:", ['Persegi', 'Trapesium', 'Segitiga'])
@@ -155,7 +155,7 @@ def parse_float(val):
 # ---------------------------------------------------------------------
 # LOGIKA PERHITUNGAN
 # ---------------------------------------------------------------------
-if st.button("HITUNG ANALISA KEAMANAN SALURAN", use_container_width=True):
+if st.button("HITUNG ANALISA", use_container_width=True):
     try:
         th_lines = [int(x.strip()) for x in w_tahun.strip().split('\n') if x.strip()]
         hj_lines = [float(x.strip().replace(',', '.')) for x in w_hujan.strip().split('\n') if x.strip()]
