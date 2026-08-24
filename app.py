@@ -43,13 +43,13 @@ st.markdown("""
 
     /* Banner Header Utama */
     .title-banner {
-        background-color: #0f172a;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
         padding: 30px 20px;
-        border-radius: 8px;
+        border-radius: 4px;
         color: white;
         text-align: center;
         margin-bottom: 30px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     .title-banner h2 {
         color: white !important;
@@ -115,8 +115,7 @@ st.markdown("""
 # ---------------------------------------------------------------------
 st.markdown("""
 <div class='title-banner'>
-    <h2>PROGRAM ANALISA FREKUENSI & KAPASITAS DRAINASE</h2>
-    <p>PERHITUNGAN HIDROLOGI METODE RASIONAL & EVALUASI SALURAN MANNING</p>
+    <h2>ANALISA FREKUENSI & KAPASITAS DRAINASE</h2>
 </div>
 """, unsafe_allow_html=True)
 
