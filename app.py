@@ -26,28 +26,31 @@ DATABASE_MANNING = {
 
 st.set_page_config(page_title="Analisa Drainase", layout="wide")
 
-st.title("ANALISA FREKUENSI & EVALUASI SALURAN")
+st.title("=== PROGRAM DRAINASE: ANALISA FREKUENSI & EVALUASI SALURAN ===")
 st.markdown("Petunjuk: Silakan periksa/sesuaikan parameter input, lalu klik tombol untuk mengkalkulasi.")
 
+# ---------------------------------------------------------------------
+# INPUT KOSONG (SUDAH DIPERBAIKI)
+# ---------------------------------------------------------------------
 st.header("1. Data Hujan Harian Maksimum Tahunan (HHMT)")
 col1, col2 = st.columns(2)
 with col1:
-    w_tahun = st.text_area("Kolom Tahun:", "2009\n2010\n2011\n2012\n2013\n2014\n2015\n2016\n2017\n2018\n2019\n2020\n2021\n2022\n2023", height=200)
+    w_tahun = st.text_area("Kolom Tahun:", "", height=200)
 with col2:
-    w_hujan = st.text_area("Kolom Hujan (mm):", "97.7\n72.5\n100.5\n117.5\n121.5\n136.0\n92.5\n105.0\n69.5\n107.8\n118.8\n115.2\n81.9\n86.5\n124.0", height=200)
+    w_hujan = st.text_area("Kolom Hujan (mm):", "", height=200)
 
 st.header("2. Parameter Daerah Tangkapan Air (Catchment Area)")
 w_c = st.selectbox("Penggunaan Lahan (C):", list(DATABASE_C.keys()))
-w_area = st.text_input("Luas DTA / Catchment Area A (km²):", "0,006726128")
-w_tc = st.text_input("Waktu Konsentrasi tc (menit):", "5")
+w_area = st.text_input("Luas DTA / Catchment Area A (km²):", "")
+w_tc = st.text_input("Waktu Konsentrasi tc (menit):", "")
 
 st.header("3. Parameter & Dimensi Saluran Drainase")
 w_shape = st.selectbox("Bentuk Saluran:", ['Persegi', 'Trapesium', 'Segitiga'])
-w_b = st.text_input("Lebar Dasar Saluran b (m):", "0.8")
-w_h = st.text_input("Tinggi Muka Air h (m):", "0.55")
-w_m = st.text_input("Kemiringan Tebing m (1:m):", "1")
+w_b = st.text_input("Lebar Dasar Saluran b (m):", "")
+w_h = st.text_input("Tinggi Muka Air h (m):", "")
+w_m = st.text_input("Kemiringan Tebing m (1:m):", "")
 w_material = st.selectbox("Bahan / Lapisan Saluran:", list(DATABASE_MANNING.keys()))
-w_slope = st.text_input("Kemiringan Saluran S (m/m):", "0.001")
+w_slope = st.text_input("Kemiringan Saluran S (m/m):", "")
 
 def parse_float(val):
     return float(str(val).replace(',', '.').strip())
@@ -64,7 +67,7 @@ if st.button("Hitung & Analisa Keamanan Saluran", type="primary"):
         m_side = parse_float(w_m)
         S_val = parse_float(w_slope)
     except Exception:
-        st.error("Pastikan seluruh angka pada kolom input diisi dengan benar (tidak ada huruf atau spasi berlebih)!")
+        st.error("Pastikan seluruh angka pada kolom input diisi dengan benar dan tidak dibiarkan kosong!")
         st.stop()
 
     if len(th_lines) != len(hj_lines):
