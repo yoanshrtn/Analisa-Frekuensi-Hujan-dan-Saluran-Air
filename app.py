@@ -25,83 +25,87 @@ DATABASE_MANNING = {
 }
 
 # ---------------------------------------------------------------------
-# SETUP HALAMAN & CUSTOM CSS (FONT ELEGAN & TANPA EMOJI)
+# SETUP HALAMAN & CUSTOM CSS (FONT MONTSERRAT & ROBOTO - BOLD & CLEAR)
 # ---------------------------------------------------------------------
 st.set_page_config(page_title="Analisa Drainase", layout="wide")
 
 st.markdown("""
 <style>
-    /* Import Font Elegan dari Google Fonts (Bodoni Moda untuk Judul, Inter untuk teks) */
-    @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@300;400;600&display=swap');
+    /* Import Font Profesional dari Google Fonts (Montserrat & Roboto) */
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Roboto:wght@400;500;700&display=swap');
 
     /* Mengubah font seluruh header bawaan Streamlit */
     h1, h2, h3, h4 {
-        font-family: 'Bodoni Moda', serif !important;
+        font-family: 'Montserrat', sans-serif !important;
         font-weight: 700 !important;
-        letter-spacing: 0.5px;
+        color: #111827 !important;
     }
 
     /* Banner Header Utama */
     .title-banner {
-        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        background-color: #0f172a;
         padding: 30px 20px;
-        border-radius: 4px;
+        border-radius: 8px;
         color: white;
         text-align: center;
         margin-bottom: 30px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
     .title-banner h2 {
-        color: white;
+        color: white !important;
         margin: 0;
-        font-family: 'Bodoni Moda', serif !important;
-        font-size: 2.2rem !important;
-        letter-spacing: 1.5px;
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 32px !important;
+        font-weight: 800 !important;
+        letter-spacing: -0.5px;
     }
     .title-banner p {
-        font-size: 15px;
-        font-family: 'Inter', sans-serif;
+        font-size: 16px;
+        font-family: 'Roboto', sans-serif;
         margin-top: 10px;
-        opacity: 0.9;
-        font-weight: 300;
-        letter-spacing: 1px;
+        color: #94a3b8;
+        font-weight: 500;
+        letter-spacing: 0.5px;
     }
 
     /* Mempercantik Tombol Hitung */
     div.stButton > button:first-child {
-        background: #1e3c72;
+        background-color: #2563eb;
         color: white;
-        border-radius: 4px;
+        border-radius: 6px;
         height: 50px;
-        font-family: 'Inter', sans-serif;
-        font-weight: 600;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
         font-size: 16px;
         border: none;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        transition: all 0.2s ease-in-out;
     }
     div.stButton > button:first-child:hover {
-        background: #2a5298;
-        box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        background-color: #1d4ed8;
+        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
     }
 
     /* Pengaturan Tabel & Teks Info */
     .custom-table { 
-        border-collapse: collapse; width: 100%; font-family: 'Inter', sans-serif; 
-        font-size: 13px; margin-bottom: 25px; color: #333; background-color: white; 
-        border-radius: 4px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border-collapse: collapse; width: 100%; font-family: 'Roboto', sans-serif; 
+        font-size: 14px; margin-bottom: 25px; color: #1f2937; background-color: white; 
+        border-radius: 6px; overflow: hidden; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
     }
-    .custom-table th { background-color: #f8f9fa; color: #1e3c72; padding: 12px; text-align: center; font-weight: 600; border: 1px solid #e0e0e0;}
-    .custom-table td { border: 1px solid #e0e0e0; padding: 10px; text-align: center; color: #333;}
-    .row-safe { background-color: #f1f8e9 !important; }
-    .row-unsafe { background-color: #ffebee !important; }
-    .status-safe { color: #2e7d32; font-weight: 600; }
-    .status-unsafe { color: #c62828; font-weight: 600; }
+    .custom-table th { background-color: #f1f5f9; color: #334155; padding: 12px; text-align: center; font-weight: 700; border: 1px solid #e2e8f0; font-family: 'Montserrat', sans-serif; font-size: 13px;}
+    .custom-table td { border: 1px solid #e2e8f0; padding: 10px; text-align: center; color: #1f2937;}
+    .row-safe { background-color: #f0fdf4 !important; }
+    .row-unsafe { background-color: #fef2f2 !important; }
+    .status-safe { color: #166534; font-weight: 700; }
+    .status-unsafe { color: #991b1b; font-weight: 700; }
     .info-box { 
-        background-color: #f8f9fa; border-left: 4px solid #1e3c72; 
-        padding: 15px 20px; font-family: 'Inter', sans-serif; font-size: 13px; 
-        margin-bottom: 20px; color: #333; border-radius: 0 4px 4px 0;
-        line-height: 1.6;
+        background-color: #f8fafc; border-left: 4px solid #3b82f6; 
+        padding: 15px 20px; font-family: 'Roboto', sans-serif; font-size: 14px; 
+        margin-bottom: 20px; color: #334155; border-radius: 0 6px 6px 0;
+        line-height: 1.6; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+    .info-box b {
+        color: #0f172a;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -152,7 +156,7 @@ def parse_float(val):
 # ---------------------------------------------------------------------
 # LOGIKA PERHITUNGAN
 # ---------------------------------------------------------------------
-if st.button("Hitung Analisa Keamanan Saluran", use_container_width=True):
+if st.button("HITUNG ANALISA KEAMANAN SALURAN", use_container_width=True):
     try:
         th_lines = [int(x.strip()) for x in w_tahun.strip().split('\n') if x.strip()]
         hj_lines = [float(x.strip().replace(',', '.')) for x in w_hujan.strip().split('\n') if x.strip()]
